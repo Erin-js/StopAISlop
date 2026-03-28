@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Detector</title>
+    <meta name="description" content="Detect whether an image is AI-generated or real using our advanced vision model.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="script.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <i data-lucide="scan-line" class="logo-icon"></i>
+                <span>Vision<span class="text-primary">Detect</span></span>
+            </div>
+            <div class="nav-actions">
+                <a href="#how-it-works" class="nav-link">How it works</a>
+                <a href="#dashboard" class="nav-link">Model</a>
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                    <i data-lucide="moon" class="theme-icon-dark"></i>
+                    <i data-lucide="sun" class="theme-icon-light hidden"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <!-- 1. Hero Section -->
+        <section class="hero text-center" id="home">
+            <div class="badge-wrapper">
+                <span class="badge badge-subtle">Powered by Advanced Deep Learning</span>
+            </div>
+            <h1 class="hero-title">Detect AI-Generated Images <br /><span class="text-primary">Instantly</span></h1>
+            <p class="hero-subtitle">Our robust vision model analyzes high-frequency noise, texture inconsistencies, and
+                visual artifacts to classify images as AI-generated or authentically real.</p>
+            <div class="hero-cta">
+                <a href="#upload-section" class="btn btn-primary btn-lg">
+                    <i data-lucide="upload-cloud"></i> Try Detection
+                </a>
+                <a href="#how-it-works" class="btn btn-secondary btn-lg">See How It Works</a>
+            </div>
+        </section>
+
+        <!-- 2. Upload Section -->
+        <section id="upload-section" class="section">
+            <div class="upload-container card">
+                <div class="upload-area" id="drop-zone">
+                    <div class="upload-icon-wrapper">
+                        <i data-lucide="image-plus" class="upload-icon"></i>
+                    </div>
+                    <h3>Drag & drop an image here</h3>
+                    <p class="text-muted">or click to browse from your computer</p>
+                    <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp" hidden>
+                    <button class="btn btn-outline mt-4" id="browse-btn">Browse Files</button>
+                    <p class="helper-text mt-3">Supports JPG, PNG, WEBP (Max 5MB)</p>
+                </div>
+
+                <div class="sample-images mt-6">
+                    <p class="text-sm text-muted mb-3 text-center">Or try a sample image</p>
+                    <div class="sample-grid text-center">
+                        <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&q=80&w=200&h=200"
+                            alt="Sample 1" class="sample-btn" data-type="real">
+                        <img src="https://images.unsplash.com/photo-1682687220198-88e9bdea9931?auto=format&fit=crop&q=80&w=200&h=200"
+                            alt="Sample 2" class="sample-btn" data-type="ai">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-container card hidden">
+                <div class="spinner"></div>
+                <h3>Analyzing Image</h3>
+                <p class="text-muted">Extracting features and running classifier...</p>
+                <div class="progress-bar-container mt-4">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Detection Result Section -->
+        <section id="result-section" class="section hidden">
+            <h2 class="section-title text-center">Analysis Result</h2>
+            <div class="result-grid">
+                <!-- Image Preview -->
+                <div class="result-image-card card">
+                    <div class="image-wrapper">
+                        <img id="preview-image" src="" alt="Uploaded image" class="preview-img">
+                        <div class="scan-line"></div>
+                    </div>
+                </div>
+
+                <!-- Result Details -->
+                <div class="result-details-card card">
+                    <div class="result-header">
+                        <div class="result-badge" id="result-badge">
+                            <i data-lucide="alert-circle" id="result-icon"></i>
+                            <span id="result-label">AI-Generated</span>
+                        </div>
+                        <span class="confidence-badge" id="confidence-level">High Confidence</span>
+                    </div>
+
+                    <div class="score-display">
+                        <h1 class="score-value" id="confidence-score">98.5%</h1>
+                        <p class="text-muted text-sm">Prediction Confidence</p>
+                    </div>
+
+                    <div class="probability-bars mt-6">
+                        <div class="bar-group">
+                            <div class="bar-label">
+                                <span>AI-Generated</span>
+                                <span id="ai-prob">98.5%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill ai-fill" id="ai-bar" style="width: 98.5%"></div>
+                            </div>
+                        </div>
+                        <div class="bar-group mt-4">
+                            <div class="bar-label">
+                                <span>Real Image</span>
+                                <span id="real-prob">1.5%</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill real-fill" id="real-bar" style="width: 1.5%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="disclaimer-note mt-6">
+                        <i data-lucide="info" class="icon-sm"></i>
+                        <p>This result is a model prediction, not absolute proof. Always verify with other sources.</p>
+                    </div>
+
+                    <button class="btn btn-outline w-full mt-4" id="reset-btn">Analyze Another Image</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Explainability Section -->
+        <section id="explainability-section" class="section hidden">
+            <div class="card explain-card bg-surface-alt">
+                <div class="explain-content">
+                    <h3>Model Attention Map</h3>
+                    <p class="text-muted mb-4">The heatmap highlights regions the model focused on to make its decision.
+                        The model primarily looks at texture consistency, unnatural edges, and background artifacts.</p>
+                    <div class="explain-metrics mb-4">
+                        <div class="metric-item"><i data-lucide="check-circle-2" class="text-success"></i> Texture
+                            Analysis</div>
+                        <div class="metric-item"><i data-lucide="check-circle-2" class="text-success"></i> Artifact
+                            Detection</div>
+                        <div class="metric-item"><i data-lucide="check-circle-2" class="text-success"></i> Frequency
+                            Domain</div>
+                    </div>
+                </div>
+                <div class="explain-visuals">
+                    <div class="visual-wrapper">
+                        <span class="visual-label">Original</span>
+                        <img id="explain-original" src="" alt="Original">
+                    </div>
+                    <div class="visual-wrapper">
+                        <span class="visual-label">Grad-CAM Heatmap</span>
+                        <div class="heatmap-container">
+                            <img id="explain-heatmap" src="" alt="Heatmap">
+                            <div class="heatmap-overlay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. How It Works Section -->
+        <section id="how-it-works" class="section mt-12">
+            <h2 class="section-title text-center">How It Works</h2>
+            <div class="steps-grid">
+                <div class="step-card card text-center">
+                    <div class="step-icon">1</div>
+                    <h4>Upload Image</h4>
+                    <p class="text-muted text-sm">Provide any JPEG, PNG, or WEBP image you want to verify.</p>
+                </div>
+                <div class="step-card card text-center">
+                    <div class="step-icon">2</div>
+                    <h4>Model Analyzes</h4>
+                    <p class="text-muted text-sm">Our deep neural network extracts visual patterns and artifacts.</p>
+                </div>
+                <div class="step-card card text-center">
+                    <div class="step-icon">3</div>
+                    <h4>View Result</h4>
+                    <p class="text-muted text-sm">Get an instant prediction with confidence scores and heatmaps.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5 & 6. Dashboard (Model Info & Metrics) -->
+        <section id="dashboard" class="section mt-12">
+            <h2 class="section-title text-center">Model Architecture & Performance</h2>
+            <div class="dashboard-grid">
+                <!-- Model Info -->
+                <div class="card model-info-card">
+                    <h3 class="mb-4 flex-align"><i data-lucide="cpu" class="mr-2"></i> System Specs</h3>
+                    <ul class="info-list">
+                        <li><span class="text-muted">Backbone:</span> <strong>Xception Net</strong></li>
+                        <li><span class="text-muted">Dataset:</span> <strong>Tiny GenImage (35k)</strong></li>
+                        <li><span class="text-muted">Task:</span> <strong>Binary Classification</strong></li>
+                        <li><span class="text-muted">Input Size:</span> <strong>299x299 px</strong></li>
+                        <li><span class="text-muted">Classes:</span> <strong>AI-Generated vs Real</strong></li>
+                    </ul>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="card metrics-card">
+                    <h3 class="mb-4 flex-align"><i data-lucide="bar-chart-2" class="mr-2"></i> Evaluation Metrics</h3>
+                    <div class="metrics-row">
+                        <div class="metric-stat">
+                            <div class="stat-value text-primary">96.7%</div>
+                            <div class="stat-label">Accuracy</div>
+                        </div>
+                        <div class="metric-stat">
+                            <div class="stat-value text-primary">0.972</div>
+                            <div class="stat-label">F1 Score</div>
+                        </div>
+                        <div class="metric-stat">
+                            <div class="stat-value text-primary">0.9956</div>
+                            <div class="stat-label">ROC AUC</div>
+                        </div>
+                    </div>
+
+                    <div class="confusion-matrix mt-4">
+                        <div class="cm-header text-sm text-center mb-2">Confusion Matrix (Validation Set)</div>
+                        <div class="cm-grid">
+                            <div class="cm-cell placeholder"></div>
+                            <div class="cm-cell label">Pred AI</div>
+                            <div class="cm-cell label">Pred Real</div>
+                            <div class="cm-cell label">True AI</div>
+                            <div class="cm-cell value bg-primary-light">3,359</div>
+                            <div class="cm-cell value bg-surface">141</div>
+                            <div class="cm-cell label">True Real</div>
+                            <div class="cm-cell value bg-surface">90</div>
+                            <div class="cm-cell value bg-primary-light">3,410</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Limitations -->
+        <section id="limitations" class="section mt-12 mb-12">
+            <div class="limitations-box">
+                <div class="limitation-icon">
+                    <i data-lucide="triangle-alert"></i>
+                </div>
+                <div class="limitation-content">
+                    <h4>Model Limitations</h4>
+                    <p>While our detector achieves high accuracy on standard datasets, performance may degrade on
+                        heavily compressed images (e.g., WhatsApp forwards), images with extreme filters, or outputs
+                        from entirely unseen generative models. Always use this tool as part of a broader verification
+                        workflow.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 9. Footer -->
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <div class="logo">
+                    <i data-lucide="scan-line" class="logo-icon"></i>
+                    <span>Vision<span class="text-primary">Detect</span></span>
+                </div>
+                <p class="text-sm text-muted mt-2">AI Image Detector</p>
+            </div>
+            <div class="footer-links">
+                <p class="text-sm text-muted">Created by <span class="font-medium text-main">IRIS - Erin & Riri</span></p>
+                <div class="social-links mt-2">
+                    <a href="#" class="icon-link"><i data-lucide="github"></i></a>
+                    <a href="#" class="icon-link"><i data-lucide="mail"></i></a>
+                    <a href="#" class="icon-link"><i data-lucide="linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom container text-center border-t mt-6 pt-6 text-sm text-muted">
+            <p>&copy; 2026 AI Image Detector Project. Academic Use Only.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
